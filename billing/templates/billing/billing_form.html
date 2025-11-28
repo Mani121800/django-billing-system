@@ -1,0 +1,42 @@
+<form method="post">
+  {% csrf_token %}
+  <label>Customer Email</label>
+  <input type="email" name="customer_email" required>
+
+  <h3>Bill section</h3>
+  <div id="items-container">
+    <div class="item-row">
+      <input type="text" name="product_id" placeholder="Product ID" required>
+      <input type="number" name="quantity" placeholder="Quantity" min="1" required>
+    </div>
+  </div>
+  <button type="button" onclick="addRow()">Add New</button>
+
+  <hr>
+
+  <h3>Denominations</h3>
+  {% for d in denominations %}
+    <div>
+      <label>{{ d.value }}</label>
+      <input type="number" name="denom_{{ d.value }}" min="0" value="{{ d.count_available }}">
+    </div>
+  {% endfor %}
+
+  <h3>Cash paid by customer</h3>
+  <input type="number" step="0.01" name="cash_paid" required>
+
+  <button type="submit">Generate Bill</button>
+</form>
+
+<script>
+function addRow() {
+  const container = document.getElementById('items-container');
+  const row = document.createElement('div');
+  row.className = 'item-row';
+  row.innerHTML = `
+    <input type="text" name="product_id" placeholder="Product ID" required>
+    <input type="number" name="quantity" placeholder="Quantity" min="1" required>
+  `;
+  container.appendChild(row);
+}
+</script>

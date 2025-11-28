@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Billing Summary</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            max-width: 1100px;
+            margin: auto;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px #ccc;
+        }
+        h2, h3 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #333;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #222;
+            color: white;
+        }
+        .summary-table td {
+            text-align: right;
+            font-weight: bold;
+        }
+        .btn {
+            padding: 10px 18px;
+            text-decoration: none;
+            background: #007bff;
+            color: white;
+            border-radius: 6px;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .section {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h2>🧾 BILL SUMMARY</h2>
+
+    <p><b>Bill ID:</b> {{ bill.id }}</p>
+    <p><b>Customer Email:</b> {{ bill.customer_email }}</p>
+    <p><b>Date:</b> {{ bill.created_at }}</p>
+
+    <!-- ✅ BILL ITEMS TABLE -->
+    <div class="section">
+        <h3>Purchased Items</h3>
+        <table>
+            <tr>
+                <th>Product ID</th>
+                <th>Unit Price</th>
+                <th>Quantity</th>
+                <th>Purchase Price</th>
+                <th>Tax (%)</th>
+                <th>Tax Amount</th>
+                <th>Total Price</th>
+            </tr>
+
+            {% for item in items %}
+            <tr>
+                <td>{{ item.product.product_id }}</td>
+                <td>₹ {{ item.unit_price }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>₹ {{ item.purchase_price }}</td>
+                <td>{{ item.product.tax_percentage }}%</td>
+                <td>₹ {{ item.tax_for_item }}</td>
+                <td>₹ {{ item.total_price_for_item }}</td>
+            </tr>
+            {% endfor %}
+
+        </table>
+    </div>
+
+    <!-- ✅ TOTAL SUMMARY -->
+    <div class="section">
+        <h3>Bill Calculation</h3>
+        <table class="summary-table">
+            <tr>
+                <td>Total Without Tax</td>
+                <td>₹ {{ bill.total_without_tax }}</td>
+            </tr>
+            <tr>
+                <td>Total Tax</td>
+                <td>₹ {{ bill.total_tax }}</td>
+            </tr>
+            <tr>
+                <td>Net Price</td>
+                <td>₹ {{ bill.net_price }}</td>
+            </tr>
+            <tr>
+                <td><b>Rounded Net Price</b></td>
+                <td><b>₹ {{ bill.rounded_net_price }}</b></td>
+            </tr>
+            <tr>
+                <td>Cash Paid</td>
+                <td>₹ {{ bill.cash_paid }}</td>
+            </tr>
+            <tr>
+                <td><b>Balance to Customer</b></td>
+                <td><b>₹ {{ bill.balance_to_customer }}</b></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- ✅ BALANCE DENOMINATION -->
+    <div class="section">
+        <h3>Balance Denomination</h3>
+        <table>
+            <tr>
+                <th>Denomination (₹)</th>
+                <th>Count Given</th>
+            </tr>
+
+            {% for d in change_denoms %}
+            <tr>
+                <td>₹ {{ d.value }}</td>
+                <td>{{ d.count }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        {% if remaining_change > 0 %}
+            <p style="color:red; font-weight:bold; margin-top:10px;">
+                ⚠ Remaining Change Not Returned: ₹ {{ remaining_change }}
+            </p>
+        {% endif %}
+    </div>
+
+    <!-- ✅ ACTION BUTTONS -->
+    <div style="text-align:center;">
+        <a href="{% url 'billing_page' %}" class="btn">➕ New Bill</a>
+        <a href="{% url 'previous_purchases' %}" class="btn">📜 View Previous Purchases</a>
+    </div>
+
+</div>
+
+</body>
+</html>

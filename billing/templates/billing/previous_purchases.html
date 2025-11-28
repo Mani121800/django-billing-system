@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Previous Purchases</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            max-width: 1000px;
+            margin: auto;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px #ccc;
+        }
+        h2 {
+            text-align: center;
+        }
+        form {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        input[type="email"] {
+            padding: 8px 10px;
+            width: 280px;
+            border-radius: 4px;
+            border: 1px solid #aaa;
+        }
+        button, .btn {
+            padding: 8px 16px;
+            text-decoration: none;
+            background: #007bff;
+            color: white;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        button:hover, .btn:hover {
+            background: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #333;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #222;
+            color: white;
+        }
+        .no-data {
+            text-align: center;
+            margin-top: 15px;
+            font-style: italic;
+        }
+        .pagination {
+            text-align: center;
+            margin-top: 15px;
+        }
+        .pagination span, .pagination a {
+            margin: 0 5px;
+            text-decoration: none;
+        }
+        .pagination .current {
+            font-weight: bold;
+        }
+        .top-actions {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h2>📜 Previous Purchases</h2>
+
+    <div class="top-actions">
+        <a href="{% url 'billing_page' %}" class="btn">➕ New Bill</a>
+    </div>
+
+    <!-- Search by Email -->
+    <form method="get">
+        <label for="email">Enter Customer Email: </label>
+        <input type="email" id="email" name="email" value="{{ email }}" required>
+        <button type="submit">Search</button>
+    </form>
+
+    {% if email and page_obj.object_list %}
+        <h3 style="text-align:center;">Showing results for: <b>{{ email }}</b></h3>
+
+        <table>
+            <tr>
+                <th>Bill ID</th>
+                <th>Date & Time</th>
+                <th>Net Price (₹)</th>
+                <th>Rounded Net Price (₹)</th>
+                <th>Cash Paid (₹)</th>
+                <th>Balance (₹)</th>
+                <th>Action</th>
+            </tr>
+
+            {% for bill in page_obj.object_list %}
+            <tr>
+                <td>{{ bill.id }}</td>
+                <td>{{ bill.created_at }}</td>
+                <td>{{ bill.net_price }}</td>
+                <td>{{ bill.rounded_net_price }}</td>
+                <td>{{ bill.cash_paid }}</td>
+                <td>{{ bill.balance_to_customer }}</td>
+                <td>
+                    <a href="{% url 'purchase_detail' bill.id %}" class="btn">View Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?email={{ email }}&page={{ page_obj.previous_page_number }}">« Prev</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?email={{ email }}&page={{ page_obj.next_page_number }}">Next »</a>
+            {% endif %}
+        </div>
+
+    {% elif email %}
+        <p class="no-data">No bills found for email: <b>{{ email }}</b></p>
+    {% else %}
+        <p class="no-data">Enter an email above to view previous purchases.</p>
+    {% endif %}
+
+</div>
+
+</body>
+</html>
